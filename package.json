@@ -1,0 +1,21 @@
+{
+  "name": "taskapp",
+  "version": "1.0.0",
+  "description": "Task app",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "cd server && npm start",
+    "start-client": "cd client && npm start",
+    "install-client": "cd client && npm install",
+    "install-server": "cd server && npm install",
+    "build-client": "cd client && npm run build",
+    "test-client": "cd client && npm test",
+    "test-server": "cd server && npm test"
+  },
+  "keywords": [],
+  "author": "Prasanth Maran",
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
