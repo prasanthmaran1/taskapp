@@ -57,7 +57,7 @@ const Task2Content = () => {
           onClose={onClose}
         />
           )}
-          <div><h3>{'Q2: Print all braces combinations for a given value n so that they are balanced'}</h3></div>
+          <div><h3>{'Q2: Print all braces combinations for a given value n so that they are balanced.'}</h3></div>
           <div><h4>{ 'Solution :'}</h4></div>
       <InputNumber
         min={1}

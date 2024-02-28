@@ -6,16 +6,20 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("../client/dist"));
 
 let stock = {
   India: 100,
   SriLanka: 100,
 };
 
-const costIndia = 30000;
-const costSriLanka = 25000;
-const exportCostPerUnit = 500;
+let costIndia = 30000;
+let costSriLanka = 25000;
+const exportCostPerBlock = 5000;
+
+function calculateExportCost(unitsNeeded) {
+  const blocks = Math.ceil(unitsNeeded / 10);
+  return blocks * exportCostPerBlock;
+}
 
 app.post("/orders", (req, res) => {
   const { country, units } = req.body;
@@ -27,6 +31,12 @@ app.post("/orders", (req, res) => {
     });
   }
 
+  if (stock.India + stock.SriLanka < units) {
+    return res.status(400).send({
+      message: "Not enough stock is available",
+    });
+  }
+
   let totalCost = 0;
   if (country === "India") {
     if (units <= stock.India) {
@@ -34,24 +44,56 @@ app.post("/orders", (req, res) => {
       stock.India -= units;
     } else {
       const availableUnits = stock.India;
-      const importUnits = units - availableUnits;
-      totalCost =
-        availableUnits * costIndia +
-        importUnits * (costSriLanka + exportCostPerUnit);
-      stock.India = 0;
+
+      let importUnits = units - availableUnits;
+      importUnits = Math.ceil(importUnits / 10) * 10; // get the no of import units eg if avi unit is 10 and order unit is 12 then it will import 10
+      if (importUnits > stock.SriLanka) {
+        return res.status(400).send({
+          message: "Not enough stock is available",
+        });
+      }
+      const importCost = calculateExportCost(importUnits);
+
+      let importcostperUnit = importCost / importUnits;
+
+      let extraImportedUnit = units - availableUnits;
+
+      let totalextraimportunitCost =
+        extraImportedUnit * (importcostperUnit + costSriLanka);
+
+      totalCost = availableUnits * costIndia + totalextraimportunitCost;
+
+      costIndia = importcostperUnit + costSriLanka;
+
+      stock.India += importUnits;
+      stock.India -= units;
       stock.SriLanka -= importUnits;
     }
-  } else if (country === "Sri Lanka") {
+  } else if (country === "SriLanka") {
     if (units <= stock.SriLanka) {
       totalCost = units * costSriLanka;
       stock.SriLanka -= units;
     } else {
       const availableUnits = stock.SriLanka;
-      const importUnits = units - availableUnits;
-      totalCost =
-        availableUnits * costSriLanka +
-        importUnits * (costIndia + exportCostPerUnit);
-      stock.SriLanka = 0;
+      let importUnits = units - availableUnits;
+      importUnits = Math.ceil(importUnits / 10) * 10;
+      if (importUnits > stock.India) {
+        return res.status(400).send({
+          message: "Not enough stock is available",
+        });
+      }
+      const importCost = calculateExportCost(importUnits);
+
+      let importcostperUnit = importCost / importUnits;
+
+      let extraImportedUnit = units - availableUnits;
+
+      let totalextraimportunitCost =
+        extraImportedUnit * (importcostperUnit + costIndia);
+
+      totalCost = availableUnits * costSriLanka + totalextraimportunitCost;
+      stock.SriLanka += importUnits;
+      stock.SriLanka -= units;
       stock.India -= importUnits;
     }
   } else {
@@ -60,7 +102,9 @@ app.post("/orders", (req, res) => {
 
   res.send({
     message: `Order placed successfully for ${units} units from ${country} with total cost: Rs.${totalCost}`,
-    stock,
+    stockIndia: stock.India,
+    stockSriLanka: stock.SriLanka,
+    totalCost,
   });
 });
 
