@@ -4,7 +4,7 @@
   "description": "Task app",
   "main": "server/server.js",
   "scripts": {
-    "start": "cd server && npm start",
+    "start": "node server/server.js",
     "start-client": "cd client && npm start",
     "install-client": "cd client && npm install",
     "install-server": "cd server && npm install",
