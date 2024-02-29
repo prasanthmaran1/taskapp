@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { calculateExportCost } from "./util/order.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,12 +15,6 @@ let stock = {
 
 let costIndia = 30000;
 let costSriLanka = 25000;
-const exportCostPerBlock = 5000;
-
-function calculateExportCost(unitsNeeded) {
-  const blocks = Math.ceil(unitsNeeded / 10);
-  return blocks * exportCostPerBlock;
-}
 
 app.post("/orders", (req, res) => {
   const { country, units } = req.body;
