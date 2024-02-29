@@ -9,18 +9,19 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "jest"
+    "test": "echo 'Running tests' && jest",
+    "prepare": "husky install",
+    "lint": "echo 'Replace this placeholder with your actual lint command'"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "*.js": [
       "npm run lint",
-      "npm test",
-      "git add ."
+      "npm test"
     ]
   },
   "author": "",
