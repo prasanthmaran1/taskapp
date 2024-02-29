@@ -41,7 +41,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   };
 
   const handleCalculate = () => {
-    if (units < 1 || units > 200) {
+    if (!Number.isInteger(units)) {
+      setErrorMessage('Invalid input: Please enter an integer value')
+      setShowAlert(true); 
+
+    }
+    else if (units < 1 || units > 200) {
       setShowAlert(true); 
     } else {
       setShowAlert(false);
